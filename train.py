@@ -140,15 +140,15 @@ def eval_epoch(model_, validation_data, device):
     return total_loss, auc_
 
 #%%
-def train(model_, training_data, validation_data, optimizer, device, opt):
+def train(model_, training_data, validation_data, optimizer, device, args):
     ''' Start training '''      
         
     log_train_file = "log/train.log"
     log_valid_file = "log/eval.log"
 
-    if opt.log:
-        log_train_file = opt.log + '.train.log'
-        log_valid_file = opt.log + '.valid.log'
+    if args.log:
+        log_train_file = args.log + '.train.log'
+        log_valid_file = args.log + '.valid.log'
 
         print('[Info] Training performance will be written to file: {} and {}'.format(
             log_train_file, log_valid_file))
@@ -157,7 +157,7 @@ def train(model_, training_data, validation_data, optimizer, device, opt):
             log_tf.write(' epoch, loss, AUC\n')
 
     valid_auc = []
-    for epoch_i in tqdm(range(opt.epoch)):
+    for epoch_i in tqdm(range(args.epoch)):
         print('\n[ Epoch = ', epoch_i, ']')
 
         start = time.time()
@@ -180,15 +180,15 @@ def train(model_, training_data, validation_data, optimizer, device, opt):
         model_state_dict = model_.state_dict()
         checkpoint = {
             'model': model_state_dict,
-            'settings': opt,
+            'args': args,
             'epoch': epoch_i}
 
-        if opt.save_model:
-            if opt.save_mode == 'all':
-                model_name = opt.save_model + '_AUC_{AUC:3.3f}.chkpt'.format(AUC=100*valid_auc_)
+        if args.save_model:
+            if args.save_mode == 'all':
+                model_name = args.save_model + '_AUC_{AUC:3.3f}.chkpt'.format(AUC=100*valid_auc_)
                 torch.save(checkpoint, model_name)
-            elif opt.save_mode == 'best':
-                model_name = opt.save_model + '.chkpt'
+            elif args.save_mode == 'best':
+                model_name = args.save_model + '.chkpt'
                 if valid_auc_ >= max(valid_auc):
                     torch.save(checkpoint, model_name)
                     print('    - [Info] The checkpoint file has been updated.')
@@ -239,8 +239,8 @@ def main():
     
     #========= Loading Dataset =========#
 #    data = torch.load(opt.data) #TODO only used for next line, why should we?
-    training_data =   kk_mimic_dataset(phase="train").loader(batch_size=opt.batch_size)
-    validation_data = kk_mimic_dataset(phase="valid").loader(batch_size=opt.batch_size)
+    training_data =   kk_mimic_dataset(phase="train").loader(batch_size=args.batch_size)
+    validation_data = kk_mimic_dataset(phase="valid").loader(batch_size=args.batch_size)
         
 
     #%%========= Preparing Model =========#
@@ -257,9 +257,9 @@ def main():
         optim.Adam(
             filter(lambda x: x.requires_grad, model_.parameters()),
             betas=(0.9, 0.98), eps=1e-09),
-        opt.d_emb_vec * opt.n_head, opt.n_warmup_steps)  #TODO 0.0001 == 100 times more!!
+        args.d_emb_vec * args.n_head, args.n_warmup_steps)  #TODO 0.0001 == 100 times more!!
 
-    train(model_, training_data, validation_data, optimizer, device ,opt)
+    train(model_, training_data, validation_data, optimizer, device, args)
 
 #%%
 if __name__ == '__main__':

@@ -42,7 +42,7 @@ class model(nn.Module):
         super(model, self).__init__()
         self.d_src_vec = args.d_src_vec
         self.d_emb_vec = args.d_emb_vec
-        self.len_seq = args.seq_len
+        self.seq_len = args.seq_len
         self.n_layers= args.n_layers
         self.n_head = args.n_head
         self.dropout = args.dropout
@@ -50,18 +50,22 @@ class model(nn.Module):
         
         self.ffn = ffn_compressed(d_in=self.d_src_vec, d_hid=self.d_inner,
                                   d_out=self.d_emb_vec)
-        
-        self.encoder = Encoder(len_seq=self.len_seq, d_word_vec=self.d_emb_vec,
-            n_layers=self.n_layers, n_head=self.n_head, d_k=self.d_emb_vec//self.n_head,
-            d_v=self.d_emb_vec//self.n_head, d_inner=self.d_inner,
-            dropout=self.dropout)       
+
+        #len_seq, n_layers, n_head, d_k, d_v, d_inner, dropout=0.1
+        self.encoder = Encoder(len_seq=self.seq_len,
+                               n_layers=self.n_layers,
+                               n_head=self.n_head,
+                               d_k=self.d_emb_vec//self.n_head,
+                               d_v=self.d_emb_vec//self.n_head,
+                               d_inner=self.d_inner,
+                               dropout=self.dropout)
         #Fully connected. Seems to have a lot of params
 #        self.FC1 = nn.Linear(self.d_emb_vec * self.len_seq , 64)   
 #        self.FC2 = nn.Linear(64, 8)
 #        self.FC3 = nn.Linear(8, 2)
         #Average pooling
-        self.avg_pooling = nn.AvgPool1d(d_emb_vec, stride=1)  #d_emb_vec-1: so that all features are average and become a scalar
-        self.FC = nn.Linear(len_seq, 2)  #2: binary classification
+        self.avg_pooling = nn.AvgPool1d(self.d_emb_vec, stride=1)  #d_emb_vec-1: so that all features are average and become a scalar
+        self.FC = nn.Linear(self.seq_len, 2)  #2: binary classification
         self.softmax = nn.Softmax(dim=-1)
         
         
