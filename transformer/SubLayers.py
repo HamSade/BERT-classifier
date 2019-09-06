@@ -94,12 +94,13 @@ class PositionwiseFeedForward(nn.Module):
 
 
 def get_subsequent_mask(seq):
-    ''' For masking out the subsequent info. '''
-    sz_b, len_s, _ = seq.size()
-    subsequent_mask = torch.triu(
-        torch.ones((len_s, len_s), device=seq.device, dtype=torch.uint8), diagonal=1)
-    subsequent_mask = subsequent_mask.unsqueeze(0).expand(sz_b, -1, -1)  # b x ls x ls
-    return subsequent_mask
+   ''' For masking out the subsequent info. '''
+   sz_b, len_s, _ = seq.size()
+   subsequent_mask = torch.triu(  torch.ones((len_s, len_s), #takes a 2D matrix
+                       device=seq.device, dtype=torch.uint8), diagonal=1)
+   subsequent_mask = subsequent_mask.unsqueeze(0).expand(sz_b, -1, -1)  # b x ls x ls  #.unsqueeze() embrace it another list. expand extends it to all batches
+
+   return subsequent_mask
 
 
 
