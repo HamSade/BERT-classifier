@@ -79,12 +79,15 @@ class Encoder(nn.Module):
     def __init__(self, len_seq, n_layers, n_head, d_k, d_v, d_inner, dropout=0.1):
 
         super(Encoder, self).__init__()
-        n_position = len_seq #+ 1  #TODO Because of SOS. Not required for continuous inputs
-        self.position_enc = nn.Embedding.from_pretrained(
-            get_sinusoid_encoding_table(n_position, d_k*n_head, padding_idx=0), #padding index is for SOS;;;; Also d_wrd_vec was changed to d_k (true #features) 
-            
-            freeze=True)  #Loading the table as a pretrained embedding. freeze=True makes sure it will not be updated and the same
-            #across encoder and decoder
+        n_position = len_seq #+ 1
+        self.position_enc = nn.Embedding.from_pretrained(get_sinusoid_encoding_table(n_position,
+                                                                                     d_k*n_head,
+                                                                                     padding_idx=0),
+                                                         freeze=True)
+
+        '''padding index is for SOS;;;; Also d_wrd_vec was changed to d_k (true #features)  
+            Loading the table as a pretrained embedding. freeze=True makes sure it will not be updated and the same
+            across encoder and decoder'''
 
         self.layer_stack = nn.ModuleList([
             EncoderLayer(d_inner, n_head, d_k, d_v, dropout=dropout)
@@ -99,7 +102,6 @@ class Encoder(nn.Module):
         slf_attn_mask = None #TODO get_attn_key_pad_mask(seq_k=src_seq[0], seq_q=src_seq[0]) 
 #        non_pad_mask = get_non_pad_mask(src_seq[0])
 
-        # -- Forward
 #        enc_output = self.src_word_emb(src_seq) + self.position_enc(src_pos) 
         src_pos = self.position_enc(src_pos)
 #        src_pos = src_pos.reshape(-1, src_pos.shape[-1])
