@@ -16,7 +16,7 @@ from transformer.Optim import ScheduledOptim
 
 import sys
 sys.path.insert(0, './dataset/')
-from kk_mimic_dataset import kk_mimic_dataset, loader
+from kk_mimic_dataset import kk_mimic_dataset
 
 from Transformer_classifier import model
 from AUCMeter import AUCMeter
@@ -216,7 +216,7 @@ def main():
     parser.add_argument('-d_v', type=int, default=1440//8)
 
     
-    parser.add_argument('-len_seq', type=int, default=10)
+    parser.add_argument('-seq_len', type=int, default=10)
     
     parser.add_argument('-d_src_vec', type=int, default=1440)    
     parser.add_argument('-d_inner', type=int, default=2048) #TODO 304/512.*2048=1216.0
@@ -234,13 +234,13 @@ def main():
     parser.add_argument('-no_cuda', action='store_true')
 #    parser.add_argument('-label_smoothing', action='store_true')
 
-    opt = parser.parse_args()
-    opt.cuda = not opt.no_cuda
+    args = parser.parse_args()
+    args.cuda = not args.no_cuda
     
     #========= Loading Dataset =========#
 #    data = torch.load(opt.data) #TODO only used for next line, why should we?
-    training_data =   loader(kk_mimic_dataset(phase="train"), batch_size=opt.batch_size) #TODO :fix
-    validation_data = loader(kk_mimic_dataset(phase="valid"), batch_size=opt.batch_size) #TODO :fix
+    training_data =   kk_mimic_dataset(phase="train").loader(batch_size=opt.batch_size)
+    validation_data = kk_mimic_dataset(phase="valid").loader(batch_size=opt.batch_size)
         
 
     #%%========= Preparing Model =========#
@@ -248,16 +248,10 @@ def main():
 #        assert training_data.dataset.src_word2idx == training_data.dataset.tgt_word2idx, \
 #            'The src/tgt word2idx table are different but asked to share word embedding.'
 
-    print('opt = ', opt)
-    device = torch.device('cuda' if opt.cuda else 'cpu')  #TODO: Check if gpu works   
+    print('args = ', args)
+    device = torch.device('cuda' if args.cuda else 'cpu')  #TODO: Check if gpu works
     
-    model_ = model(d_src_vec=opt.d_src_vec,            
-                 len_seq=opt.len_seq,
-                 d_emb_vec=opt.d_emb_vec,
-                 n_layers = opt.n_layers,
-                 n_head=opt.n_head, d_k=opt.d_emb_vec//opt.n_head,
-                 d_v=opt.d_emb_vec//opt.n_head,
-                 d_inner=opt.d_inner, dropout=opt.dropout).cuda(device=device)    #TODO
+    model_ = model(args).cuda(device=device)
 
     optimizer = ScheduledOptim(
         optim.Adam(

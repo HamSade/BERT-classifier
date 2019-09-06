@@ -37,22 +37,16 @@ class ffn_compressed(nn.Module):
         
 class model(nn.Module):
         
-    def __init__(self, d_src_vec,            
-                 len_seq,
-                 d_emb_vec,
-                 n_layers,
-                 n_head, d_k,
-                 d_v,
-                 d_inner, dropout):
+    def __init__(self, args):
         
         super(model, self).__init__()
-        self.d_src_vec = d_src_vec
-        self.d_emb_vec = d_emb_vec
-        self.len_seq = len_seq
-        self.n_layers= n_layers
-        self.n_head = n_head
-        self.dropout = dropout
-        self.d_inner = d_inner
+        self.d_src_vec = args.d_src_vec
+        self.d_emb_vec = args.d_emb_vec
+        self.len_seq = args.seq_len
+        self.n_layers= args.n_layers
+        self.n_head = args.n_head
+        self.dropout = args.dropout
+        self.d_inner = args.d_inner
         
         self.ffn = ffn_compressed(d_in=self.d_src_vec, d_hid=self.d_inner,
                                   d_out=self.d_emb_vec)
