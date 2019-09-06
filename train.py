@@ -207,7 +207,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-data', default='trained.chkpt', required=False)
-    parser.add_argument('-epoch', type=int, default=1000)
+    parser.add_argument('-epoch', type=int, default=50)
     parser.add_argument('-batch_size', type=int, default=16)
 
     
@@ -244,10 +244,6 @@ def main():
         
 
     #%%========= Preparing Model =========#
-#    if opt.embs_share_weight:
-#        assert training_data.dataset.src_word2idx == training_data.dataset.tgt_word2idx, \
-#            'The src/tgt word2idx table are different but asked to share word embedding.'
-
     print('opt = ', opt)
     device = torch.device('cuda' if opt.cuda else 'cpu')  #TODO: Check if gpu works   
     
