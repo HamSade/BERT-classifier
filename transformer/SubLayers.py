@@ -1,12 +1,14 @@
 ''' Define the sublayers in encoder/decoder layer '''
 
-#import torch
+import torch
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 
-#from transformer.Modules import ScaledDotProductAttention
-from Modules import ScaledDotProductAttention
+try:
+    from transformer.Modules import ScaledDotProductAttention
+except:
+    from Modules import ScaledDotProductAttention
 
 #%%
 class MultiHeadAttention(nn.Module):
@@ -91,7 +93,13 @@ class PositionwiseFeedForward(nn.Module):
         return output
 
 
-
+def get_subsequent_mask(seq):
+    ''' For masking out the subsequent info. '''
+    sz_b, len_s, _ = seq.size()
+    subsequent_mask = torch.triu(
+        torch.ones((len_s, len_s), device=seq.device, dtype=torch.uint8), diagonal=1)
+    subsequent_mask = subsequent_mask.unsqueeze(0).expand(sz_b, -1, -1)  # b x ls x ls
+    return subsequent_mask
 
 
 
