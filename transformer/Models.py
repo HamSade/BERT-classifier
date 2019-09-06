@@ -11,7 +11,7 @@ except:
     import Constants as Constants
     from Layers import EncoderLayer#, DecoderLayer
 
-##########################################################
+#%%
 def get_sinusoid_encoding_table(n_position, d_emb_vec, padding_idx=None):
     ''' Sinusoid position encoding table '''
 
@@ -38,7 +38,7 @@ def get_sinusoid_encoding_table(n_position, d_emb_vec, padding_idx=None):
 #print(T)
 #print(np.sum(T, axis=0))
 
-##########################################################
+#%%
 
 def get_non_pad_mask(seq):
     '''Just pads the parts that are equal to Constants.PAD'''    
@@ -53,7 +53,7 @@ def get_non_pad_mask(seq):
 #mask = get_non_pad_mask(seq)
 #print(mask)
 
-##########################################################
+#%%
 def get_attn_key_pad_mask(seq_k, seq_q):
     ''' For masking out the padding part of key sequence. '''
 
@@ -72,18 +72,13 @@ def get_attn_key_pad_mask(seq_k, seq_q):
 #padding_mask = get_non_pad_mask(seq)
 #print(padding_mask)  
 
-##########################################################
+#%%
 class Encoder(nn.Module):
     ''' An encoder model with self attention mechanism. '''
 
-    def __init__(
-            self,
-            len_seq, d_word_vec,
-            n_layers, n_head, d_k, d_v,
-            d_inner, dropout=0.1):
+    def __init__(self, len_seq, n_layers, n_head, d_k, d_v, d_inner, dropout=0.1):
 
         super(Encoder, self).__init__()
-                      
         n_position = len_seq #+ 1  #TODO Because of SOS. Not required for continuous inputs
         self.position_enc = nn.Embedding.from_pretrained(
             get_sinusoid_encoding_table(n_position, d_k*n_head, padding_idx=0), #padding index is for SOS;;;; Also d_wrd_vec was changed to d_k (true #features) 
