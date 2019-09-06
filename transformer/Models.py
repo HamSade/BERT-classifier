@@ -4,11 +4,12 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-#import transformer.Constants as Constants
-#from transformer.Layers import EncoderLayer#, DecoderLayer
-
-import Constants as Constants
-from Layers import EncoderLayer#, DecoderLayer
+try:
+    import transformer.Constants as Constants
+    from transformer.Layers import EncoderLayer#, DecoderLayer
+except:
+    import Constants as Constants
+    from Layers import EncoderLayer#, DecoderLayer
 
 ##########################################################
 def get_sinusoid_encoding_table(n_position, d_emb_vec, padding_idx=None):
@@ -127,16 +128,6 @@ class Encoder(nn.Module):
 #            return enc_output, enc_slf_attn_list
         return enc_output
 
-##########################################################
-#def get_subsequent_mask(seq):
-#    ''' For masking out the subsequent info. '''
-#
-#    sz_b, len_s = seq.size()
-#    subsequent_mask = torch.triu(  torch.ones((len_s, len_s), #takes a 2D matrix
-#                        device=seq.device, dtype=torch.uint8), diagonal=1)
-#    subsequent_mask = subsequent_mask.unsqueeze(0).expand(sz_b, -1, -1)  # b x ls x ls  #.unsqueeze() embrace it another list. expand extends it to all batches
-#
-#    return subsequent_mask
 
 
 
