@@ -1,3 +1,3 @@
 Hello!
 
-This is a modified version of Transformer used to classify MIMIC III diabetes data.
+This is a modified version of BERT (Transformer) used to predict mortality on MIMIC III as a classification problem.
